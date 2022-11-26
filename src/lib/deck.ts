@@ -16,7 +16,7 @@ export type Card = {
 
 export function generateDeck() {
 	let deck: Card[] = [];
-	let id = 0;
+	let id = 1;
 	for (const suit of ['heart', 'diamond', 'club', 'spade'] as Suit[]) {
 		for (let value = 1; value <= 13; value++) {
 			deck.push({ id: id++, suit, value, owner: -1 });
