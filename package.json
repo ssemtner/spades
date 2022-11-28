@@ -34,5 +34,9 @@
 		"vite": "^3.1.0"
 	},
 	"type": "module",
-	"dependencies": {}
+	"dependencies": {
+		"cardsJS": "^1.1.1",
+		"firebase": "9",
+		"node-sass": "^8.0.0"
+	}
 }

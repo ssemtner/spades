@@ -5,6 +5,7 @@
 	import { pile, spadesPlayed } from '$lib/gameState.ts';
 
 	export let cards;
+	export let hidden = false;
 
 	let cardsValid;
 	$: cardsValid = cards.map(card => (isValidPlay(card, cards, $pile, $spadesPlayed)));
@@ -25,7 +26,7 @@
 
     @layer components {
         .card {
-            @apply relative inline-block -mx-[5.5%] transform transition duration-300;
+            @apply -mx-[5.5%] transition transition-all duration-300;
         }
 
         .card:not(.selected) {
@@ -41,23 +42,23 @@
         }
 
         .card.invalid {
-            @apply opacity-50;
+            filter: brightness(80%);
         }
     }
 </style>
 
-<div class='ml-16'>
+<div class='flex flex-row justify-center'>
 	{#each cards as card, i (card.id)}
 		<button
 			animate:flip
 			out:send={{key: card.id}}
 			class='card'
-			class:selected={selected === card.id}
-			class:invalid={!cardsValid[i]}
-			style='rotate: {(i - cards.length / 2) * 3}deg'
+			class:selected={selected === card.id && !hidden}
+			class:invalid={!cardsValid[i] && !hidden}
+			style='rotate: {(i - cards.length / 2) * -3}deg'
 			on:click={() => {select(card, i)}}
 		>
-			<PlayingCard suit={card.suit} value={card.value} />
+			<PlayingCard suit={card.suit} value={card.value} back={hidden} />
 		</button>
 	{/each}
 </div>
