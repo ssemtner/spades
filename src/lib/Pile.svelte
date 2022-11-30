@@ -1,25 +1,25 @@
 <script lang='ts'>
-    import PlayingCard from '$lib/PlayingCard.svelte';
-    import type {Card} from './deck';
-    import {PlayerLocation} from './deck';
-    import {fade} from 'svelte/transition';
+	import PlayingCard from '$lib/PlayingCard.svelte';
+	import type { Card } from './types';
+	import { PlayerLocation } from './types';
+	import { fade } from 'svelte/transition';
 
-    export let cards: Card[];
-    export let receive;
+	export let cards: Card[];
+	export let receive;
 
-    const margins = [
-        [PlayerLocation.NORTH, ''],
-        [PlayerLocation.EAST, 'ml-32 mt-32'],
-        [PlayerLocation.SOUTH, 'mt-64'],
-        [PlayerLocation.WEST, '-ml-32 mt-32']
-    ]
+	const margins = [
+		[PlayerLocation.NORTH, ''],
+		[PlayerLocation.EAST, 'ml-32 mt-32'],
+		[PlayerLocation.SOUTH, 'mt-64'],
+		[PlayerLocation.WEST, '-ml-32 mt-32']
+	];
 
-    let locations;
+	let locations;
 
-    $: locations = margins.map(x => ({
-        card: cards.filter(card => card.owner === x[0])[0],
-        margin: x[1]
-    }))
+	$: locations = margins.map(x => ({
+		card: cards.filter(card => card.owner === x[0])[0],
+		margin: x[1]
+	}));
 </script>
 
 <div class='grid grid-rows-1 grid-cols-1'>

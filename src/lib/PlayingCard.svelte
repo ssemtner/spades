@@ -1,122 +1,122 @@
 <script lang='ts'>
 
-    // type Suit = string;
-    // type Value = number
+	// type Suit = string;
+	// type Value = number
 
-    export let suit;
-    export let value: number;
-    export let back = false;
-    export let pipsEnabled = false;
+	export let suit;
+	export let value: number;
+	export let back = false;
+	export let pipsEnabled = false;
 
-    let displayValue: string;
-    switch (value) {
-        case 11:
-            displayValue = 'J';
-            break;
-        case 12:
-            displayValue = 'Q';
-            break;
-        case 13:
-            displayValue = 'K';
-            break;
-        default:
-            displayValue = value as string;
-    }
+	let displayValue: string;
+	switch (value) {
+		case 11:
+			displayValue = 'J';
+			break;
+		case 12:
+			displayValue = 'Q';
+			break;
+		case 13:
+			displayValue = 'K';
+			break;
+		default:
+			displayValue = value as string;
+	}
 
-    const getPips = (): { left: string, top: string, flip?: boolean }[] => {
-        switch (value) {
-            case 1:
-                return [
-                    {left: '50%', top: '50%'}
-                ];
-            case 2:
-                return [
-                    {left: '50%', top: '20%'},
-                    {left: '50%', top: '80%', flip: true}
-                ];
-            case 3:
-                return [
-                    {left: '50%', top: '50%'},
-                    {left: '50%', top: '20%'},
-                    {left: '50%', top: '80%', flip: true}
-                ];
-            case 4:
-                return [
-                    {left: '33%', top: '20%'},
-                    {left: '33%', top: '80%', flip: true},
-                    {left: '67%', top: '20%'},
-                    {left: '67%', top: '80%', flip: true}
-                ];
-            case 5:
-                return [
-                    {left: '50%', top: '50%'},
-                    {left: '33%', top: '20%'},
-                    {left: '33%', top: '80%', flip: true},
-                    {left: '67%', top: '20%'},
-                    {left: '67%', top: '80%', flip: true}
-                ];
-            case 6:
-                return [
-                    {left: '33%', top: '50%'},
-                    {left: '33%', top: '20%'},
-                    {left: '33%', top: '80%', flip: true},
-                    {left: '67%', top: '50%'},
-                    {left: '67%', top: '20%'},
-                    {left: '67%', top: '80%', flip: true}
-                ];
-            case 7:
-                return [
-                    {left: '33%', top: '50%'},
-                    {left: '33%', top: '20%'},
-                    {left: '33%', top: '80%', flip: true},
-                    {left: '67%', top: '50%'},
-                    {left: '67%', top: '20%'},
-                    {left: '67%', top: '80%', flip: true},
-                    {left: '50%', top: '35%'}
-                ];
-            case 8:
-                return [
-                    {left: '33%', top: '20%'},
-                    {left: '33%', top: '40%'},
-                    {left: '33%', top: '60%', flip: true},
-                    {left: '33%', top: '80%', flip: true},
-                    {left: '67%', top: '20%'},
-                    {left: '67%', top: '40%'},
-                    {left: '67%', top: '60%', flip: true},
-                    {left: '67%', top: '80%', flip: true}
-                ];
-            case 9:
-                return [
-                    {left: '50%', top: '50%'},
-                    {left: '33%', top: '20%'},
-                    {left: '33%', top: '40%'},
-                    {left: '33%', top: '60%', flip: true},
-                    {left: '33%', top: '80%', flip: true},
-                    {left: '67%', top: '20%'},
-                    {left: '67%', top: '40%'},
-                    {left: '67%', top: '60%', flip: true},
-                    {left: '67%', top: '80%', flip: true}
-                ];
-            case 10:
-                return [
-                    {left: '50%', top: '35%'},
-                    {left: '50%', top: '65%', flip: true},
-                    {left: '33%', top: '20%'},
-                    {left: '33%', top: '40%'},
-                    {left: '33%', top: '60%', flip: true},
-                    {left: '33%', top: '80%', flip: true},
-                    {left: '67%', top: '20%'},
-                    {left: '67%', top: '40%'},
-                    {left: '67%', top: '60%', flip: true},
-                    {left: '67%', top: '80%', flip: true}
-                ];
-            default:
-                return [];
-        }
-    };
+	const getPips = (): { left: string, top: string, flip?: boolean }[] => {
+		switch (value) {
+			case 1:
+				return [
+					{ left: '50%', top: '50%' }
+				];
+			case 2:
+				return [
+					{ left: '50%', top: '20%' },
+					{ left: '50%', top: '80%', flip: true }
+				];
+			case 3:
+				return [
+					{ left: '50%', top: '50%' },
+					{ left: '50%', top: '20%' },
+					{ left: '50%', top: '80%', flip: true }
+				];
+			case 4:
+				return [
+					{ left: '33%', top: '20%' },
+					{ left: '33%', top: '80%', flip: true },
+					{ left: '67%', top: '20%' },
+					{ left: '67%', top: '80%', flip: true }
+				];
+			case 5:
+				return [
+					{ left: '50%', top: '50%' },
+					{ left: '33%', top: '20%' },
+					{ left: '33%', top: '80%', flip: true },
+					{ left: '67%', top: '20%' },
+					{ left: '67%', top: '80%', flip: true }
+				];
+			case 6:
+				return [
+					{ left: '33%', top: '50%' },
+					{ left: '33%', top: '20%' },
+					{ left: '33%', top: '80%', flip: true },
+					{ left: '67%', top: '50%' },
+					{ left: '67%', top: '20%' },
+					{ left: '67%', top: '80%', flip: true }
+				];
+			case 7:
+				return [
+					{ left: '33%', top: '50%' },
+					{ left: '33%', top: '20%' },
+					{ left: '33%', top: '80%', flip: true },
+					{ left: '67%', top: '50%' },
+					{ left: '67%', top: '20%' },
+					{ left: '67%', top: '80%', flip: true },
+					{ left: '50%', top: '35%' }
+				];
+			case 8:
+				return [
+					{ left: '33%', top: '20%' },
+					{ left: '33%', top: '40%' },
+					{ left: '33%', top: '60%', flip: true },
+					{ left: '33%', top: '80%', flip: true },
+					{ left: '67%', top: '20%' },
+					{ left: '67%', top: '40%' },
+					{ left: '67%', top: '60%', flip: true },
+					{ left: '67%', top: '80%', flip: true }
+				];
+			case 9:
+				return [
+					{ left: '50%', top: '50%' },
+					{ left: '33%', top: '20%' },
+					{ left: '33%', top: '40%' },
+					{ left: '33%', top: '60%', flip: true },
+					{ left: '33%', top: '80%', flip: true },
+					{ left: '67%', top: '20%' },
+					{ left: '67%', top: '40%' },
+					{ left: '67%', top: '60%', flip: true },
+					{ left: '67%', top: '80%', flip: true }
+				];
+			case 10:
+				return [
+					{ left: '50%', top: '35%' },
+					{ left: '50%', top: '65%', flip: true },
+					{ left: '33%', top: '20%' },
+					{ left: '33%', top: '40%' },
+					{ left: '33%', top: '60%', flip: true },
+					{ left: '33%', top: '80%', flip: true },
+					{ left: '67%', top: '20%' },
+					{ left: '67%', top: '40%' },
+					{ left: '67%', top: '60%', flip: true },
+					{ left: '67%', top: '80%', flip: true }
+				];
+			default:
+				return [];
+		}
+	};
 
-    let corners = ['top left', 'bottom right'];
-    let pips = pipsEnabled ? getPips() : [];
+	let corners = ['top left', 'bottom right'];
+	let pips = pipsEnabled ? getPips() : [];
 </script>
 
 <style lang='scss'>
@@ -229,23 +229,23 @@
 </style>
 
 {#if !back}
-    <div class='card {suit === "heart" || suit === "diamond" ? "red" : "black"}'>
-        {#each corners as corner}
-            <div class='corner {corner}'>
-                <h1>{displayValue}</h1>
-                <span class='pip {suit}'></span>
-            </div>
-        {/each}
+	<div class='card {suit === "heart" || suit === "diamond" ? "red" : "black"}'>
+		{#each corners as corner}
+			<div class='corner {corner}'>
+				<h1>{displayValue}</h1>
+				<span class='pip {suit}'></span>
+			</div>
+		{/each}
 
-        <div class='pips'>
-            {#each pips as pip}
-                <span class='pip {suit}' class:flip={pip.flip} style:left={pip.left} style:top={pip.top}></span>
-            {/each}
-            {#if pips.length === 0}
-                <h1>{displayValue}</h1>
-            {/if}
-        </div>
-    </div>
+		<div class='pips'>
+			{#each pips as pip}
+				<span class='pip {suit}' class:flip={pip.flip} style:left={pip.left} style:top={pip.top}></span>
+			{/each}
+			{#if pips.length === 0}
+				<h1>{displayValue}</h1>
+			{/if}
+		</div>
+	</div>
 {:else}
-    <div class='card back'></div>
+	<div class='card back'></div>
 {/if}

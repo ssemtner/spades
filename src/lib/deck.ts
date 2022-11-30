@@ -1,18 +1,4 @@
-export enum PlayerLocation {
-	SOUTH,
-	EAST,
-	NORTH,
-	WEST
-}
-
-export type Suit = 'heart' | 'diamond' | 'club' | 'spade'
-
-export type Card = {
-	suit: Suit
-	value: number
-	owner: PlayerLocation
-	id: number
-}
+import type { Card, Suit } from './types';
 
 export function generateDeck() {
 	let deck: Card[] = [];

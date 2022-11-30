@@ -14,7 +14,7 @@
 			out:send={{key: card.id}}
 			class='row-span-full col-span-full'
 		>
-			<PlayingCard suit={card.suit} value={card.value} back/>
+			<PlayingCard suit={card.suit} value={card.value} back />
 		</div>
 	{/each}
 </div>

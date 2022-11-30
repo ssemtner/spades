@@ -1,24 +1,25 @@
-<script>
-    import PlayingCard from '$lib/PlayingCard.svelte';
-    import {flip} from 'svelte/animate';
-    import {isValidPlay} from '$lib/game.ts';
-    import {pile, spadesPlayed} from '$lib/gameState.ts';
+<script lang='ts'>
+	import PlayingCard from '$lib/PlayingCard.svelte';
+	import { flip } from 'svelte/animate';
+	import { isValidPlay } from '$lib/game.ts';
+	import { pile, spadesPlayed } from '$lib/gameState.ts';
+	import type { Card } from '$lib/types';
 
-    export let cards;
-    export let hidden = false;
+	export let cards: Card[];
+	export let hidden = false;
 
-    let cardsValid;
-    $: cardsValid = cards.map(card => (isValidPlay(card, cards, $pile, $spadesPlayed)));
+	let cardsValid;
+	$: cardsValid = cards.map(card => (isValidPlay(card, cards, $pile, $spadesPlayed)));
 
-    export let selected = undefined;
+	export let selected = undefined;
 
-    export let send;
+	export let send;
 
-    const select = (card, index) => {
-        if (cardsValid[index]) {
-            selected = (selected === card.id ? undefined : card.id);
-        }
-    };
+	const select = (card, index) => {
+		if (cardsValid[index]) {
+			selected = (selected === card.id ? undefined : card.id);
+		}
+	};
 </script>
 
 <style>
