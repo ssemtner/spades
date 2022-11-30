@@ -4,13 +4,10 @@
 
 	const q = getDocs(collection(db, 'games'));
 
-	q.then((d) => d.forEach(a => console.log(a.data())));
-
+	q.then((d) => d.forEach((a) => console.log(a.data())));
+	let t = 0;
 </script>
 
 <h1>Testing Firebase</h1>
-
-{#await q then x}
-	<pre>{x}</pre>
-{/await}
-
+<p>{t}</p>
+<button on:click={() => (t += 3)}>Inc</button>
