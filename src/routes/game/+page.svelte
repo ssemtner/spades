@@ -1,19 +1,18 @@
 <script lang='ts'>
 	import { crossfade } from 'svelte/transition';
 	import { determineTrickWinner, isValidPlay } from '$lib/game';
-	import { deck, pile, spadesPlayed } from '$lib/gameState';
+	import { deck, pile, players, spadesPlayed } from '$lib/gameState';
 	import Pile from '$lib/Pile.svelte';
 	import Hand from '$lib/Hand.svelte';
 	import ComputerHand from '$lib/ComputerHand.svelte';
-	import type { Player } from '$lib/types';
+	import Scoreboard from '$lib/Scoreboard.svelte';
 
 	const [send, receive] = crossfade({
 		duration: 150
 	});
 
-	let players: Player[] = [];
 	for (let i = 0; i < 4; i++) {
-		players.push({
+		$players.push({
 			id: i,
 			selected: false,
 			tricks: 0,
@@ -25,70 +24,68 @@
 	let turn = 0;
 	let controlledPlayer = 0;
 
-	players.forEach(player => {
+	$players.forEach(player => {
 		if (player.id !== controlledPlayer) {
 			player.computer = true;
 		}
 	});
 
 	const playCard = () => {
-		if (!turn) {
-			return;
-		}
-
-		if (players[turn].selected) {
-			const cardPlayed = $deck.filter(c => c.id === players[turn].selected)[0];
+		if ($players[turn].selected) {
+			const cardPlayed = $deck.filter(c => c.id === $players[turn].selected)[0];
 
 			if (cardPlayed.suit === 'spade') {
 				$spadesPlayed = true;
 			}
 
 			$pile = [...$pile, cardPlayed];
-			$deck = $deck.filter(c => c.id !== players[turn].selected);
+			$deck = $deck.filter(c => c.id !== $players[turn].selected);
 
 			if (turn === 3) {
-				players[determineTrickWinner($pile)].tricks++;
+				$players[determineTrickWinner($pile)].tricks++;
 				setTimeout(() => {
 					$pile = [];
 				}, 1000);
 			}
 			turn = (turn + 1) % 4;
 
-			players = players;
+			$players = $players;
 		}
 	};
 
 	const playRandom = () => {
 		const hand = $deck.filter(card => card.owner === turn);
 		const options = hand.filter(card => isValidPlay(card, hand, $pile, $spadesPlayed));
-		players[turn].selected = options[Math.floor(Math.random() * options.length)].id;
+		$players[turn].selected = options[Math.floor(Math.random() * options.length)].id;
 		playCard();
 	};
 </script>
 
 <svelte:head>
-    <title>Spades Game</title>
+	<title>Spades Game</title>
 </svelte:head>
 
+<section class='flex flex-row justify-center gap-4'>
+	{#each $players.filter(player => player.computer) as player (player.id)}
+		<ComputerHand cards={$deck.filter(card => card.owner === player.id)} {send} />
+	{/each}
+</section>
+
+<section class='flex flex-row justify-around align-middle'>
+	<Scoreboard scores={$players.map(player => player.tricks)} title='Tricks' />
+	<Pile cards={$pile} {receive} />
+	<Scoreboard scores={[0, 0, 0, 0]} title='Score' />
+</section>
+
 <section class='flex flex-row justify-center'>
-    {#each players.filter(player => player.computer) as player (player.id)}
-        <ComputerHand cards={$deck.filter(card => card.owner === player.id)} {send}/>
-    {/each}
+	<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playCard}>Play Card</button>
+	<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playRandom}>Play Random</button>
 </section>
 
 <section class='flex flex-row justify-center align-middle'>
-    <Pile cards={$pile} {receive}/>
-</section>
-
-<section class="flex flex-row justify-center">
-    <button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playCard}>Play Card</button>
-    <button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playRandom}>Play Random</button>
-</section>
-
-<section class='flex flex-row justify-center align-middle'>
-    <Hand bind:selected={players[controlledPlayer].selected}
-          cards={$deck.filter(card => card.owner === controlledPlayer)}
-          {send}/>
+	<Hand bind:selected={$players[controlledPlayer].selected}
+				cards={$deck.filter(card => card.owner === controlledPlayer)}
+				{send} />
 </section>
 
 <style>

@@ -23,18 +23,17 @@
 </script>
 
 <div class='grid grid-rows-1 grid-cols-1'>
-    {#each locations as location}
-        {#if location.card}
-            <div class='col-span-full row-span-full translate-x-1/4 {location.margin} scale-75'
-                 in:receive={{key: location.card.id}}
-                 out:fade={{duration: 600}}>
-                <PlayingCard suit={location.card.suit} value={location.card.value}/>
-            </div>
-        {:else}
-            <div class='col-span-full row-span-full translate-x-1/4 {location.margin}' in:receive={{key: 1}}
-                 out:fade={{duration: 600}}>
-                <div class="w-[150px] h-[200px] m-[5px] relative"></div>
-            </div>
-        {/if}
-    {/each}
+	{#each locations as location}
+		{#if location.card}
+			<div class='col-span-full row-span-full translate-x-1/4 {location.margin}'
+					 in:receive={{key: location.card.id}}
+					 out:fade={{duration: 600}}>
+				<PlayingCard suit={location.card.suit} value={location.card.value} />
+			</div>
+		{:else}
+			<div class='col-span-full row-span-full translate-x-1/4 {location.margin}'>
+				<div class='w-[150px] h-[200px] m-[5px] relative'></div>
+			</div>
+		{/if}
+	{/each}
 </div>

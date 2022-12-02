@@ -17,4 +17,9 @@
 			<PlayingCard suit={card.suit} value={card.value} back />
 		</div>
 	{/each}
+	{#if cards.length === 0}
+		<div class='col-span-full row-span-full translate-x-1/4'>
+			<div class="w-[150px] h-[200px] m-[5px] bg-gray-100 rounded"></div>
+		</div>
+	{/if}
 </div>
