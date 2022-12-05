@@ -1,7 +1,7 @@
 <script lang='ts'>
 	import { crossfade } from 'svelte/transition';
 	import { determineTrickWinner, isValidPlay } from '$lib/game';
-	import { deck, pile, players, spadesPlayed } from '$lib/gameState';
+	import { state } from '$lib/gameState';
 	import Pile from '$lib/Pile.svelte';
 	import Hand from '$lib/Hand.svelte';
 	import ComputerHand from '$lib/ComputerHand.svelte';
@@ -12,51 +12,47 @@
 	});
 
 	for (let i = 0; i < 4; i++) {
-		$players.push({
+		state.setPlayers([...state.getPlayers(), {
 			id: i,
 			selected: false,
 			tricks: 0,
 			computer: false,
 			controlled: false
-		});
+		}]);
 	}
 
 	let turn = 0;
 	let controlledPlayer = 0;
-
-	$players.forEach(player => {
-		if (player.id !== controlledPlayer) {
-			player.computer = true;
-		}
-	});
+	let selected = undefined;
 
 	const playCard = () => {
-		if ($players[turn].selected) {
-			const cardPlayed = $deck.filter(c => c.id === $players[turn].selected)[0];
+		if (selected) {
+			const cardPlayed = state.getDeck().filter(c => c.id === state.getPlayers()[turn].selected)[0];
 
 			if (cardPlayed.suit === 'spade') {
-				$spadesPlayed = true;
+				state.setSpadesPlayed(true);
 			}
 
-			$pile = [...$pile, cardPlayed];
-			$deck = $deck.filter(c => c.id !== $players[turn].selected);
+			state.setPile([...state.getPile(), cardPlayed]);
+			state.setDeck(state.getDeck().filter(c => ))
+			deck = deck.filter(c => c.id !== players[turn].selected);
 
 			if (turn === 3) {
-				$players[determineTrickWinner($pile)].tricks++;
+				players[determineTrickWinner(pile)].tricks++;
 				setTimeout(() => {
-					$pile = [];
+					pile = [];
 				}, 1000);
 			}
 			turn = (turn + 1) % 4;
 
-			$players = $players;
+			players = players;
 		}
 	};
 
 	const playRandom = () => {
-		const hand = $deck.filter(card => card.owner === turn);
-		const options = hand.filter(card => isValidPlay(card, hand, $pile, $spadesPlayed));
-		$players[turn].selected = options[Math.floor(Math.random() * options.length)].id;
+		const hand = deck.filter(card => card.owner === turn);
+		const options = hand.filter(card => isValidPlay(card, hand, pile, spadesPlayed));
+		players[turn].selected = options[Math.floor(Math.random() * options.length)].id;
 		playCard();
 	};
 </script>
@@ -66,14 +62,14 @@
 </svelte:head>
 
 <section class='flex flex-row justify-center gap-4'>
-	{#each $players.filter(player => player.computer) as player (player.id)}
-		<ComputerHand cards={$deck.filter(card => card.owner === player.id)} {send} />
+	{#each state.getPlayers().filter(player => player.id !== controlledPlayer) as player (player.id)}
+		<ComputerHand cards={deck.filter(card => card.owner === player.id)} {send} />
 	{/each}
 </section>
 
 <section class='flex flex-row justify-around align-middle'>
-	<Scoreboard scores={$players.map(player => player.tricks)} title='Tricks' />
-	<Pile cards={$pile} {receive} />
+	<Scoreboard scores={state.getPlayers().map(player => player.tricks)} title='Tricks' />
+	<Pile cards={pile} {receive} />
 	<Scoreboard scores={[0, 0, 0, 0]} title='Score' />
 </section>
 
@@ -83,8 +79,8 @@
 </section>
 
 <section class='flex flex-row justify-center align-middle'>
-	<Hand bind:selected={$players[controlledPlayer].selected}
-				cards={$deck.filter(card => card.owner === controlledPlayer)}
+	<Hand bind:selected={selected}
+				cards={deck.filter(card => card.owner === controlledPlayer)}
 				{send} />
 </section>
 

@@ -2,14 +2,14 @@
 	import PlayingCard from '$lib/PlayingCard.svelte';
 	import { flip } from 'svelte/animate';
 	import { isValidPlay } from '$lib/game.ts';
-	import { pile, spadesPlayed } from '$lib/gameState.ts';
+	import { state } from '$lib/gameState.ts';
 	import type { Card } from '$lib/types';
 
 	export let cards: Card[];
 	export let hidden = false;
 
 	let cardsValid;
-	$: cardsValid = cards.map(card => (isValidPlay(card, cards, $pile, $spadesPlayed)));
+	$: cardsValid = cards.map(card => (isValidPlay(card, cards, state.getPile(), state.getSpadesPlayed())));
 
 	export let selected = undefined;
 
