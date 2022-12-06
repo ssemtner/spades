@@ -1,7 +1,6 @@
 <script lang='ts'>
 	import PlayingCard from '$lib/PlayingCard.svelte';
 	import { flip } from 'svelte/animate';
-	import { isValidPlay } from '$lib/game.ts';
 	import { state } from '$lib/gameState.ts';
 	import type { Card } from '$lib/types';
 
@@ -9,7 +8,19 @@
 	export let hidden = false;
 
 	let cardsValid;
-	$: cardsValid = cards.map(card => (isValidPlay(card, cards, state.getPile(), state.getSpadesPlayed())));
+	$: {
+		Promise.all([state.getPile(), state.getSpadesPlayed()]).then((result) => {
+			console.log(result);
+			cardsValid = cards.map(card => card.id);
+			// cardsValid = cards.map(card => isValidPlay(card, cards, result[0], result[1]))
+		});
+	}
+	const test = () => {
+		Promise.all([state.getPile(), state.getSpadesPlayed()]).then((result) => {
+			console.log(result);
+		});
+	};
+	// cardsValid = cards.map(card => (isValidPlay(card, cards, state.getPile(), state.getSpadesPlayed())));
 
 	export let selected = undefined;
 
@@ -47,19 +58,17 @@
         }
     }
 </style>
-
 <div class='flex flex-row justify-center items-center'>
-    {#each cards as card, i (card.id)}
-        <button
-                animate:flip
-                out:send={{key: card.id}}
-                class='card'
-                class:selected={selected === card.id && !hidden}
-                class:invalid={!cardsValid[i] && !hidden}
-                style='rotate: {(i - cards.length / 2) * 3}deg'
-                on:click={() => {select(card, i)}}
-        >
-            <PlayingCard suit={card.suit} value={card.value} back={hidden}/>
-        </button>
-    {/each}
+	{#each cards as card, i (card.id)}
+		<button
+			animate:flip
+			out:send={{key: card.id}}
+			class='card'
+			class:selected={selected === card.id && !hidden}
+			style='rotate: {(i - cards.length / 2) * 3}deg'
+			on:click={() => {select(card, i)}}
+		>
+			<PlayingCard suit={card.suit} value={card.value} back={hidden} />
+		</button>
+	{/each}
 </div>

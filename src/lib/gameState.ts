@@ -4,21 +4,19 @@
 
 import type { Card, Player } from './types';
 import { generateDeck } from './deck';
-import { db } from './firebase';
-import type { DocumentData, DocumentReference } from 'firebase/firestore';
-import { doc, setDoc } from 'firebase/firestore';
+import { isValidPlay } from './game';
 
 interface IGameState {
-	getSpadesPlayed: () => boolean;
-	setSpadesPlayed: (value: boolean) => void;
-	getPile: () => Card[];
-	setPile: (value: Card[]) => void;
-	getDeck: () => Card[];
-	setDeck: (value: Card[]) => void;
-	getPlayers: () => Player[];
-	setPlayers: (value: Player[]) => void;
-	getGameId: () => string;
-	setGameId: (value: string) => void;
+	getSpadesPlayed: () => Promise<boolean>;
+	setSpadesPlayed: (value: boolean) => Promise<void>;
+	getPile: () => Promise<Card[]>;
+	setPile: (value: Card[]) => Promise<void>;
+	getDeck: () => Promise<Card[]>;
+	setDeck: (value: Card[]) => Promise<void>;
+	getPlayers: () => Promise<Player[]>;
+	setPlayers: (value: Player[]) => Promise<void>;
+	getGameId: () => Promise<string>;
+	setGameId: (value: string) => Promise<void>;
 }
 
 class ComputerGame implements IGameState {
@@ -36,46 +34,47 @@ class ComputerGame implements IGameState {
 		this._gameId = '';
 	}
 
-	getSpadesPlayed(): boolean {
+	async getSpadesPlayed(): Promise<boolean> {
 		return this._spadesPlayed;
 	}
 
-	setSpadesPlayed(value: boolean) {
+	async setSpadesPlayed(value: boolean) {
 		this._spadesPlayed = value;
 	}
 
-	getPile(): Card[] {
+	async getPile(): Promise<Card[]> {
 		return this._pile;
 	}
 
-	setPile(value: Card[]) {
+	async setPile(value: Card[]) {
 		this._pile = value;
 	}
 
-	getDeck(): Card[] {
+	async getDeck(): Promise<Card[]> {
 		return this._deck;
 	}
 
-	setDeck(value: Card[]) {
+	async setDeck(value: Card[]) {
 		this._deck = value;
 	}
 
-	getPlayers(): Player[] {
+	async getPlayers(): Promise<Player[]> {
 		return this._players;
 	}
 
-	setPlayers(value: Player[]) {
+	async setPlayers(value: Player[]) {
 		this._players = value;
 	}
 
-	getGameId(): string {
+	async getGameId(): Promise<string> {
 		return this._gameId;
 	}
 
-	setGameId(value: string) {
+	async setGameId(value: string) {
 		this._gameId = value;
 	}
 }
+
 //
 // class OnlineGame implements IGameState {
 // 	private _spadesPlayed = false;
@@ -154,26 +153,68 @@ export const resetGame = () => {
 	state = new ComputerGame();
 };
 
-//
-// export const spadesPlayed = writable(false);
-//
-// export const pile: Writable<Card[]> = writable([]);
-//
-// export const deck = writable(generateDeck());
-//
-// export const players: Writable<Player[]> = writable([]);
-//
-// export const gameId = writable('');
-//
-// const generateGameId = (): string => {
-// 	return Math.floor(Date.now()).toString();
-// };
-//
-// const setDeck = async (desk: Card[]) => {
-// 	await setDoc(doc(db, 'games', get(gameId)), {
-// 		deck
-// 	});
-// };
-//
-// const getDeck;
-//
+export const clearPile = async () => {
+	await state.setPile([]);
+};
+
+export const moveToPile = async (cardId: number): Promise<boolean> => {
+	const deck = await state.getDeck();
+	const pile = await state.getPile();
+	const card = deck.find(card => card.id === cardId);
+
+	if (card === undefined) {
+		return false;
+	}
+
+	if (card.suit === 'spade') {
+		await state.setSpadesPlayed(true);
+	}
+
+	await state.setDeck(deck.filter(card => card.id !== cardId));
+	await state.setPile([...pile, card]);
+
+	return true;
+};
+
+export const getHand = async (playerId: number): Promise<Card[]> => {
+	const deck = await state.getDeck();
+	return deck.filter(card => card.owner === playerId);
+};
+
+export const addTrick = async (playerId: number): Promise<boolean> => {
+	const players = await state.getPlayers();
+	const index = players.findIndex(player => player.id === playerId);
+
+	if (index === -1) {
+		return false;
+	}
+
+	players[index].tricks++;
+
+	await state.setPlayers(players);
+
+	return true;
+};
+
+export const selectRandomCard = async (playerId: number): Promise<number> => {
+	const deck = await state.getDeck();
+	const pile = await state.getPile();
+	const spadesPlayed = await state.getSpadesPlayed();
+	const hand = deck.filter(card => card.owner === playerId);
+
+	if (hand.length === 0) {
+		return -1;
+	}
+
+	const options = hand.filter(card => isValidPlay(card, hand, pile, spadesPlayed));
+	const index = Math.floor(Math.random() * options.length);
+
+	return options[index].id;
+};
+
+export const refreshState = () => {
+	state.getPile = state.getPile;
+	state.getDeck = state.getDeck;
+	state.getSpadesPlayed = state.getSpadesPlayed;
+	state.getPlayers = state.getPlayers;
+};
