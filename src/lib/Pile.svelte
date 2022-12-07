@@ -17,13 +17,13 @@
 	let locations;
 
 	$: locations = margins.map(x => ({
-		card: cards.filter(card => card.owner === x[0])[0],
+		card: cards.find(card => card.owner === x[0]),
 		margin: x[1]
 	}));
 </script>
 
 <div class='grid grid-rows-1 grid-cols-1'>
-	{#each locations as location}
+	{#each locations as location, i}
 		{#if location.card}
 			<div class='col-span-full row-span-full translate-x-1/4 {location.margin}'
 					 in:receive={{key: location.card.id}}
@@ -31,7 +31,7 @@
 				<PlayingCard suit={location.card.suit} value={location.card.value} />
 			</div>
 		{:else}
-			<div class='col-span-full row-span-full translate-x-1/4 {location.margin}'>
+			<div class='col-span-full row-span-full translate-x-1/4 {margins[i][1]}'>
 				<div class='w-[150px] h-[200px] m-[5px] relative'></div>
 			</div>
 		{/if}

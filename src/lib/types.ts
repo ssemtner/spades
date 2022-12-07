@@ -16,7 +16,6 @@ export type Card = {
 
 export type Player = {
 	id: number
-	selected: number | false
 	tricks: number
 	computer: boolean
 	controlled: boolean

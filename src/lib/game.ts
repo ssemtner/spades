@@ -42,7 +42,7 @@ export function isValidPlay(card: Card, hand: Card[], pile: Card[], spadesPlayed
     }
 
     const suitLed = pile[0].suit;
-    console.log(suitLed)
+
     if (card.suit === suitLed) {
         return true;
     }

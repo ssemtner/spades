@@ -1,26 +1,15 @@
 <script lang='ts'>
 	import PlayingCard from '$lib/PlayingCard.svelte';
 	import { flip } from 'svelte/animate';
-	import { state } from '$lib/gameState.ts';
+	import { isValidPlay } from '$lib/game.ts';
+	import { pile, spadesPlayed } from '$lib/gameState.ts';
 	import type { Card } from '$lib/types';
 
 	export let cards: Card[];
 	export let hidden = false;
 
 	let cardsValid;
-	$: {
-		Promise.all([state.getPile(), state.getSpadesPlayed()]).then((result) => {
-			console.log(result);
-			cardsValid = cards.map(card => card.id);
-			// cardsValid = cards.map(card => isValidPlay(card, cards, result[0], result[1]))
-		});
-	}
-	const test = () => {
-		Promise.all([state.getPile(), state.getSpadesPlayed()]).then((result) => {
-			console.log(result);
-		});
-	};
-	// cardsValid = cards.map(card => (isValidPlay(card, cards, state.getPile(), state.getSpadesPlayed())));
+	$: cardsValid = cards.map(card => (isValidPlay(card, cards, $pile, $spadesPlayed)));
 
 	export let selected = undefined;
 
@@ -58,6 +47,7 @@
         }
     }
 </style>
+
 <div class='flex flex-row justify-center items-center'>
 	{#each cards as card, i (card.id)}
 		<button
@@ -65,6 +55,7 @@
 			out:send={{key: card.id}}
 			class='card'
 			class:selected={selected === card.id && !hidden}
+			class:invalid={!cardsValid[i] && !hidden}
 			style='rotate: {(i - cards.length / 2) * 3}deg'
 			on:click={() => {select(card, i)}}
 		>
