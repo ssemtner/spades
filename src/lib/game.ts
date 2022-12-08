@@ -18,7 +18,7 @@ function highestOfSuit(cards: Card[], suit: Suit): Card | undefined {
 }
 
 // Returns player location of trick winner
-export function determineTrickWinner(cards: [Card, Card, Card, Card]): PlayerLocation {
+export function determineTrickWinner(cards: Card[]): PlayerLocation {
     // find the highest spade played
     const highestSpade = highestOfSuit(cards, 'spade');
     if (highestSpade) {

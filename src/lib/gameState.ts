@@ -10,7 +10,8 @@
 import type { Card, Player } from './types';
 import { get, type Writable, writable } from 'svelte/store';
 import { generateDeck } from './deck';
-import { isValidPlay } from './game';
+import { determineTrickWinner, isValidPlay } from './game';
+import { sendGameState } from './firebase';
 
 function createCustomStore<Type>(defaultValue: Type): Writable<Type> {
 	const { subscribe, set, update } = writable<Type>(defaultValue);
@@ -51,6 +52,26 @@ export function chooseRandomPlay(playerId: number): number {
 	return options[index].id;
 }
 
+export function finishTurn() {
+	if (get(turn) === turn.end) {
+		const winner = determineTrickWinner(get(pile));
+		players.addTrick(winner);
+		setTimeout(() => {
+			pile.set([]);
+			setTimeout(() => {
+				turn.reset(winner);
+				!get(onlineGame) || sendGameState(get(gameId));
+			}, 500);
+		}, 1000);
+	}
+
+	turn.next();
+}
+
+export function makeComputerPlay(playerId: number) {
+	const cardId = chooseRandomPlay(playerId);
+}
+
 export function resetGame() {
 	spadesPlayed.set(false);
 	deck.set(generateDeck());
@@ -61,6 +82,7 @@ export function resetGame() {
 		computer: false,
 		controlled: false
 	})));
+	turn.reset(0);
 }
 
 export const spadesPlayed = writable(false);
@@ -87,8 +109,23 @@ export const players = {
 	}
 };
 
+export const turn = {
+	...createCustomStore(0),
+	end: 0,
+	next: function() {
+		this.update(prev => ((prev + 1) % 4));
+	},
+	reset: function(start: number) {
+		this.set(start);
+		this.end = start - 1;
+		if (this.end === -1) {
+			this.end = 3;
+		}
+	}
+};
+
 export const onlineGame = writable(false);
 
 export const gameId = {
-	...createCustomStore('')
+	...createCustomStore('test')
 };

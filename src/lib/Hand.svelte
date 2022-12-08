@@ -7,9 +7,11 @@
 
 	export let cards: Card[];
 	export let hidden = false;
+	export let disabled = false;
 
 	let cardsValid;
-	$: cardsValid = cards.map(card => (isValidPlay(card, cards, $pile, $spadesPlayed)));
+	$: cardsValid = cards.map(card => (disabled ? false : isValidPlay(card, cards, $pile, $spadesPlayed)));
+
 
 	export let selected = undefined;
 

@@ -1,32 +1,40 @@
 <script lang='ts'>
 	import { crossfade } from 'svelte/transition';
-	import { determineTrickWinner } from '$lib/game';
-	import { addToPile, chooseRandomPlay, deck, pile, players, resetGame } from '$lib/gameState';
+	import {
+		addToPile,
+		chooseRandomPlay,
+		deck,
+		finishTurn,
+		gameId,
+		onlineGame,
+		pile,
+		players,
+		resetGame,
+		turn
+	} from '$lib/gameState';
 	import Pile from '$lib/Pile.svelte';
 	import Hand from '$lib/Hand.svelte';
 	import ComputerHand from '$lib/ComputerHand.svelte';
 	import { onMount } from 'svelte';
 	import { getGameState, sendGameState } from '../../lib/firebase';
+	import Scoreboard from '$lib/Scoreboard.svelte';
 
 	onMount(() => {
 		resetGame();
 	});
 
-	setInterval(() => {
-		if (turn !== controlledPlayer) {
-			getGameState('test');
-		}
-	}, 4000);
-
-	const testFirebase = () => {
-		sendGameState('test');
-	};
+	if ($onlineGame) {
+		setInterval(() => {
+			if ($turn !== controlledPlayer) {
+				getGameState($gameId);
+			}
+		}, 4000);
+	}
 
 	const [send, receive] = crossfade({
 		duration: 150
 	});
 
-	let turn = 0;
 	let controlledPlayer = 0;
 
 	let selected: number | false = false;
@@ -38,51 +46,67 @@
 	});
 
 	const playCard = () => {
-		if (selected !== false) {
+		if (selected !== false && $turn === controlledPlayer) {
 			addToPile(selected);
 
-			if (turn === 3) {
-				players.addTrick(determineTrickWinner($pile));
-				setTimeout(() => {
-					$pile = [];
-				}, 1000);
-			}
-			turn = (turn + 1) % 4;
+			!$onlineGame || sendGameState($gameId);
+
+			finishTurn();
+
+			selected = false;
 		}
 	};
 
 	const playRandom = () => {
-		selected = chooseRandomPlay(turn);
+		selected = chooseRandomPlay($turn);
 		playCard();
 	};
+
+	$: {
+		if ($turn !== controlledPlayer) {
+			setTimeout(() => {
+				if ($turn !== controlledPlayer) {
+					const card = chooseRandomPlay($turn);
+					addToPile(card);
+					finishTurn();
+				}
+			}, 1000);
+		}
+	}
 </script>
 
 <svelte:head>
-	<title>Spades Game</title>
+	<title>{$onlineGame ? 'Online' : 'Local'} Spades Game</title>
 </svelte:head>
+<div class='flex md:flex-row flex-col md:justify-between justify-center'>
 
-<button class='p-4 rounded text-white bg-amber-600 mx-auto' on:click={testFirebase}>Test Firebase</button>
+	<section class='md:w-1/4 flex md:flex-col flex-row justify-center items-center'>
+		{#each [1, 2, 3] as p }
+			<ComputerHand cards={$deck.filter(card => card.owner === p)} {send} active={$turn === p} />
+		{/each}
+	</section>
 
-<section class='flex flex-row justify-center'>
-	{#each [3, 2, 1] as p }
-		<ComputerHand cards={$deck.filter(card => card.owner === p)} {send} />
-	{/each}
-</section>
+	<main class=''>
+		<section class='flex flex-row justify-center align-middle my-8'>
+			<Pile cards={$pile} {receive} />
+		</section>
 
-<section class='flex flex-row justify-center align-middle'>
-	<Pile cards={$pile} {receive} />
-</section>
+		<section class='flex flex-row justify-center'>
+			<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playCard}>Play Card</button>
+			<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playRandom}>Play Random</button>
+		</section>
 
-<section class='flex flex-row justify-center'>
-	<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playCard}>Play Card</button>
-	<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playRandom}>Play Random</button>
-</section>
+		<section class='flex flex-row justify-center align-middle'>
+			<Hand bind:selected={selected}
+						cards={$deck.filter(card => card.owner === controlledPlayer)}
+						{send} />
+		</section>
+	</main>
 
-<section class='flex flex-row justify-center align-middle'>
-	<Hand bind:selected={selected}
-				cards={$deck.filter(card => card.owner === controlledPlayer)}
-				{send} />
-</section>
-
+	<section class='md:w-1/4 flex md:flex-col flex-row md:justify-start justify-center mt-4'>
+		<Scoreboard active={$turn} controlled={controlledPlayer} scores={$players.map(player => player.tricks)}
+								title='Tricks' />
+	</section>
+</div>
 <style>
 </style>

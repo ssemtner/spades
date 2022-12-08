@@ -1,12 +1,10 @@
 <script lang='ts'>
+	import type { Suit } from './types';
 
-	// type Suit = string;
-	// type Value = number
-
-	export let suit;
+	export let suit: Suit;
 	export let value: number;
 	export let back = false;
-	export let pipsEnabled = false;
+	export let pipsEnabled = true;
 
 	let displayValue: string;
 	switch (value) {
@@ -18,6 +16,9 @@
 			break;
 		case 13:
 			displayValue = 'K';
+			break;
+		case 14:
+			displayValue = 'A';
 			break;
 		default:
 			displayValue = value as string;
@@ -122,7 +123,7 @@
 <style lang='scss'>
   @import url("https://fonts.googleapis.com/css?family=Lora:400,700");
 
-  $base: 50px;
+  $base: 45px;
   body {
     padding: 10px 0 0 10px;
   }
@@ -131,7 +132,6 @@
     font-family: Lora, serif;
     font-weight: 700;
     float: left;
-    margin: 5px;
     width: $base * 3;
     height: $base * 4;
     background: linear-gradient(to left top, white, #f0f0f0);
@@ -224,7 +224,6 @@
   }
 
   .back {
-		margin: 5px;
     background: linear-gradient(to top, #0f0c29, #302b63, #24243e);
   }
 </style>

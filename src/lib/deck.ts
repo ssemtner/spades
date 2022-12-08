@@ -4,7 +4,7 @@ export function generateDeck() {
 	let deck: Card[] = [];
 	let id = 1;
 	for (const suit of ['heart', 'diamond', 'club', 'spade'] as Suit[]) {
-		for (let value = 1; value <= 13; value++) {
+		for (let value = 2; value <= 14; value++) {
 			deck.push({ id: id++, suit, value, owner: -1 });
 		}
 	}
