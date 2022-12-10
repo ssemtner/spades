@@ -22,15 +22,15 @@
 			margin: x[1],
 			order: cards.findIndex(card => card.owner === x[0])
 		}));
-		locations.sort((a, b) => {
-			if (a.order < b.order) {
-				return -1;
-			} else if (a.order > b.order) {
-				return 1;
-			} else {
-				return 0;
-			}
-		});
+		//locations.sort((a, b) => {
+		//		if (a.order < b.order) {
+		//			return -1;
+		//		} else if (a.order > b.order) {
+		//			return 1;
+		//		} else {
+		//			return 0;
+		//		}
+		//	});
 	}
 </script>
 

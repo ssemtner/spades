@@ -24,7 +24,7 @@ function createCustomStore<Type>(defaultValue: Type): Writable<Type> {
 }
 
 export function addToPile(cardId: number): boolean {
-	const card = get(deck).find(card => card.id === cardId);
+	const card = get(deck).find((card) => card.id === cardId);
 
 	if (card === undefined) {
 		return false;
@@ -34,8 +34,8 @@ export function addToPile(cardId: number): boolean {
 		spadesPlayed.set(true);
 	}
 
-	deck.update(prev => prev.filter(card => card.id !== cardId));
-	pile.update(prev => [...prev, card]);
+	deck.update((prev) => prev.filter((card) => card.id !== cardId));
+	pile.update((prev) => [...prev, card]);
 
 	return true;
 }
@@ -46,7 +46,7 @@ export function chooseRandomPlay(playerId: number): number {
 		return -1;
 	}
 
-	const options = hand.filter(card => isValidPlay(card, hand, get(pile), get(spadesPlayed)));
+	const options = hand.filter((card) => isValidPlay(card, hand, get(pile), get(spadesPlayed)));
 	const index = Math.floor(Math.random() * options.length);
 
 	return options[index].id;
@@ -76,12 +76,14 @@ export function resetGame() {
 	spadesPlayed.set(false);
 	deck.set(generateDeck());
 	pile.set([]);
-	players.set([0, 1, 2, 3].map(id => ({
-		id,
-		tricks: 0,
-		computer: false,
-		controlled: false
-	})));
+	players.set(
+		[0, 1, 2, 3].map((id) => ({
+			id,
+			tricks: 0,
+			computer: false,
+			controlled: false
+		}))
+	);
 	turn.reset(0);
 }
 
@@ -94,14 +96,14 @@ export const pile = {
 export const deck = {
 	...createCustomStore<Card[]>([]),
 	getHand: function(playerId: number) {
-		return get(this).filter(card => card.owner === playerId);
+		return get(this).filter((card) => card.owner === playerId);
 	}
 };
 
 export const players = {
 	...createCustomStore<Player[]>([]),
 	addTrick: function(playerId: number) {
-		this.update(prev => {
+		this.update((prev) => {
 			const newPlayers = [...prev];
 			newPlayers[playerId].tricks++;
 			return newPlayers;
@@ -113,7 +115,7 @@ export const turn = {
 	...createCustomStore(0),
 	end: 0,
 	next: function() {
-		this.update(prev => ((prev + 1) % 4));
+		this.update((prev) => (prev + 1) % 4);
 	},
 	reset: function(start: number) {
 		this.set(start);
