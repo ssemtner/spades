@@ -7,21 +7,24 @@
 	export let pipsEnabled = true;
 
 	let displayValue: string;
-	switch (value) {
-		case 11:
-			displayValue = 'J';
-			break;
-		case 12:
-			displayValue = 'Q';
-			break;
-		case 13:
-			displayValue = 'K';
-			break;
-		case 14:
-			displayValue = 'A';
-			break;
-		default:
-			displayValue = value as string;
+
+	$: {
+		switch (value) {
+			case 11:
+				displayValue = 'J';
+				break;
+			case 12:
+				displayValue = 'Q';
+				break;
+			case 13:
+				displayValue = 'K';
+				break;
+			case 14:
+				displayValue = 'A';
+				break;
+			default:
+				displayValue = value as string;
+		}
 	}
 
 	const getPips = (): { left: string, top: string, flip?: boolean }[] => {

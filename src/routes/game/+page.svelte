@@ -7,20 +7,31 @@
 		finishTurn,
 		gameId,
 		onlineGame,
-		pile,
 		players,
 		resetGame,
+		step,
 		turn
 	} from '$lib/gameState';
-	import Pile from '$lib/Pile.svelte';
 	import Hand from '$lib/Hand.svelte';
 	import ComputerHand from '$lib/ComputerHand.svelte';
 	import { onMount } from 'svelte';
 	import { getGameState, sendGameState } from '../../lib/firebase';
 	import Scoreboard from '$lib/Scoreboard.svelte';
+	import { GameStep } from '../../lib/types';
+	import Bid from '$lib/Bid.svelte';
+	import Pile from '$lib/Pile.svelte';
+	import { makeBid, pile } from '$lib/gameState.js';
 
 	onMount(() => {
 		resetGame();
+		setInterval(() => {
+
+			if ($step === GameStep.COMPUTER_PLAY) {
+				const card = chooseRandomPlay($turn);
+				addToPile(card);
+				finishTurn();
+			}
+		}, 2000);
 	});
 
 	if ($onlineGame) {
@@ -39,14 +50,8 @@
 
 	let selected: number | false = false;
 
-	$players.forEach(player => {
-		if (player.id !== controlledPlayer) {
-			player.computer = true;
-		}
-	});
-
 	const playCard = () => {
-		if (selected !== false && $turn === controlledPlayer) {
+		if (selected !== false && $step === GameStep.HUMAN_PLAY) {
 			addToPile(selected);
 
 			!$onlineGame || sendGameState($gameId);
@@ -61,18 +66,6 @@
 		selected = chooseRandomPlay($turn);
 		playCard();
 	};
-
-	$: {
-		if ($turn !== controlledPlayer) {
-			setTimeout(() => {
-				if ($turn !== controlledPlayer) {
-					const card = chooseRandomPlay($turn);
-					addToPile(card);
-					finishTurn();
-				}
-			}, 1000);
-		}
-	}
 </script>
 
 <svelte:head>
@@ -86,9 +79,13 @@
 		{/each}
 	</section>
 
-	<main class=''>
+	<main class='flex flex-col justify-between'>
 		<section class='flex flex-row justify-center align-middle my-8'>
-			<Pile cards={$pile} {receive} />
+			{#if $step in [GameStep.BID, GameStep.WAIT_FOR_BID]}
+				<Bid onSelect={(s) => {makeBid(s)}} waiting={$step === GameStep.WAIT_FOR_BID} />
+			{:else}
+				<Pile cards={$pile} {receive} />
+			{/if}
 		</section>
 
 		<section class='flex flex-row justify-center'>
@@ -108,5 +105,11 @@
 								title='Tricks' />
 	</section>
 </div>
+
+<!--{(console.log($deck), '')}-->
+<!--{(console.log($pile), '')}-->
+<!--{(console.log($step), '')}-->
+<!--{(console.log("turn: " + $turn), '')}-->
+
 <style>
 </style>

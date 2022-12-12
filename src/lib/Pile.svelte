@@ -48,4 +48,12 @@
 			</div>
 		{/if}
 	{/each}
+
+	<!--{#each cards as card, i (card.id)}-->
+	<!--	<div class='col-span-full row-span-full translate-x-1/4 {margins.find(margin => margin[0] === card.owner)[1]}'-->
+	<!--			 in:receive={{key: card.id}}-->
+	<!--			 out:fade={{duration: 600, delay: 400}}>-->
+	<!--		<PlayingCard suit={card.suit} value={card.value} />-->
+	<!--	</div>-->
+	<!--{/each}-->
 </div>

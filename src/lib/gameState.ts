@@ -8,6 +8,7 @@
  * the gamestate will be non async just writable stores the the update function sets
  */
 import type { Card, Player } from './types';
+import { GameStep } from './types';
 import { get, type Writable, writable } from 'svelte/store';
 import { generateDeck } from './deck';
 import { determineTrickWinner, isValidPlay } from './game';
@@ -52,24 +53,43 @@ export function chooseRandomPlay(playerId: number): number {
 	return options[index].id;
 }
 
+function setStepByTurn() {
+	if (get(players)[get(turn)].computer) {
+		step.set(get(onlineGame) ? GameStep.REMOTE_PLAY : GameStep.COMPUTER_PLAY);
+	} else {
+		step.set(GameStep.HUMAN_PLAY);
+	}
+}
+
 export function finishTurn() {
 	if (get(turn) === turn.end) {
 		const winner = determineTrickWinner(get(pile));
 		players.addTrick(winner);
+		step.set(GameStep.WAIT);
 		setTimeout(() => {
 			pile.set([]);
 			setTimeout(() => {
+				pile.set([]);
 				turn.reset(winner);
 				!get(onlineGame) || sendGameState(get(gameId));
+				setStepByTurn();
 			}, 500);
 		}, 1000);
+	} else {
+		turn.next();
+		setStepByTurn();
 	}
-
-	turn.next();
 }
 
-export function makeComputerPlay(playerId: number) {
-	const cardId = chooseRandomPlay(playerId);
+export function makeBid(bid: number) {
+	const player = get(players).find(player => player.controlled);
+	if (player === undefined) {
+		return false;
+	}
+
+	player.bid = bid;
+
+	step.set(GameStep.WAIT_FOR_BID);
 }
 
 export function resetGame() {
@@ -80,11 +100,13 @@ export function resetGame() {
 		[0, 1, 2, 3].map((id) => ({
 			id,
 			tricks: 0,
-			computer: false,
-			controlled: false
+			computer: !get(onlineGame) && id !== 0,
+			controlled: id === 0,
+			bid: false
 		}))
 	);
 	turn.reset(0);
+	step.set(GameStep.BID);
 }
 
 export const spadesPlayed = writable(false);
@@ -131,3 +153,5 @@ export const onlineGame = writable(false);
 export const gameId = {
 	...createCustomStore('test')
 };
+
+export const step = writable<GameStep>(GameStep.NONE);

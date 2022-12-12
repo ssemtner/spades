@@ -19,4 +19,15 @@ export type Player = {
 	tricks: number
 	computer: boolean
 	controlled: boolean
+	bid: number | false
+}
+
+export enum GameStep {
+	NONE,
+	HUMAN_PLAY,
+	REMOTE_PLAY,
+	COMPUTER_PLAY,
+	WAIT,
+	BID,
+	WAIT_FOR_BID,
 }
