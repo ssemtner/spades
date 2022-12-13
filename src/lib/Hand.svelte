@@ -22,6 +22,8 @@
 			selected = (selected === card.id ? undefined : card.id);
 		}
 	};
+
+	let width;
 </script>
 
 <style>
@@ -29,7 +31,7 @@
 
     @layer components {
         .card {
-            @apply -mx-12 transition transition-all duration-300;
+            @apply transition transition-all duration-300;
         }
 
         .card:not(.selected) {
@@ -50,15 +52,17 @@
     }
 </style>
 
-<div class='flex flex-row justify-center items-center'>
+<svelte:window bind:innerWidth={width} />
+
+<div class='flex flex-row md:justify-center p-2 items-center overflow-x-scroll'>
 	{#each cards as card, i (card.id)}
 		<button
 			animate:flip
 			out:send={{key: card.id}}
-			class='card'
+			class='card {width > 800 ? "-mx-12" : "-mx-4"}'
 			class:selected={selected === card.id && !hidden}
 			class:invalid={!cardsValid[i] && !hidden}
-			style='rotate: {(i - cards.length / 2) * 3}deg'
+			style='rotate: {width > 800 ? (i - cards.length / 2) * 3 : 0}deg'
 			on:click={() => {select(card, i)}}
 		>
 			<PlayingCard suit={card.suit} value={card.value} back={hidden} />

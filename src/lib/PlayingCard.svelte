@@ -4,7 +4,7 @@
 	export let suit: Suit;
 	export let value: number;
 	export let back = false;
-	export let pipsEnabled = true;
+	export let pipsEnabled = false;
 
 	let displayValue: string;
 

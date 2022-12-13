@@ -9,6 +9,7 @@
 		onlineGame,
 		players,
 		resetGame,
+		setStepByTurn,
 		step,
 		turn
 	} from '$lib/gameState';
@@ -25,7 +26,6 @@
 	onMount(() => {
 		resetGame();
 		setInterval(() => {
-
 			if ($step === GameStep.COMPUTER_PLAY) {
 				const card = chooseRandomPlay($turn);
 				addToPile(card);
@@ -66,14 +66,23 @@
 		selected = chooseRandomPlay($turn);
 		playCard();
 	};
+
+	$: {
+		if ($step === GameStep.WAIT_FOR_BID) {
+			for (let player of $players.filter(player => player.computer === true)) {
+				players.setBid(player.id, Math.floor(Math.random() * 4) + 1);
+			}
+			setStepByTurn();
+		}
+	}
 </script>
 
 <svelte:head>
 	<title>{$onlineGame ? 'Online' : 'Local'} Spades Game</title>
 </svelte:head>
-<div class='flex md:flex-row flex-col md:justify-between justify-center'>
+<div class='flex lg:flex-row flex-col lg:justify-between justify-center'>
 
-	<section class='md:w-1/4 flex md:flex-col flex-row justify-center items-center'>
+	<section class='md:w-1/4 flex md:flex-col flex-row justify-center items-center overflow-x-hidden'>
 		{#each [1, 2, 3] as p }
 			<ComputerHand cards={$deck.filter(card => card.owner === p)} {send} active={$turn === p} />
 		{/each}
@@ -81,34 +90,36 @@
 
 	<main class='flex flex-col justify-between'>
 		<section class='flex flex-row justify-center align-middle my-8'>
-			{#if $step in [GameStep.BID, GameStep.WAIT_FOR_BID]}
+			{#if $step === GameStep.BID || $step === GameStep.WAIT_FOR_BID}
 				<Bid onSelect={(s) => {makeBid(s)}} waiting={$step === GameStep.WAIT_FOR_BID} />
 			{:else}
+
 				<Pile cards={$pile} {receive} />
 			{/if}
 		</section>
 
-		<section class='flex flex-row justify-center'>
-			<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playCard}>Play Card</button>
-			<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playRandom}>Play Random</button>
-		</section>
+		{#if $step !== GameStep.BID && $step !== GameStep.WAIT_FOR_BID}
+			<section class='flex flex-row justify-center mb-4'>
+				<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playCard}>Play Card</button>
+			</section>
+		{/if}
 
 		<section class='flex flex-row justify-center align-middle'>
 			<Hand bind:selected={selected}
 						cards={$deck.filter(card => card.owner === controlledPlayer)}
+						disabled={!$players[$turn]?.controlled || [GameStep.BID, GameStep.WAIT_FOR_BID].indexOf($step) > -1}
 						{send} />
 		</section>
 	</main>
 
-	<section class='md:w-1/4 flex md:flex-col flex-row md:justify-start justify-center mt-4'>
-		<Scoreboard active={$turn} controlled={controlledPlayer} scores={$players.map(player => player.tricks)}
-								title='Tricks' />
+	<section class='lg:w-1/4 flex lg:flex-col flex-row lg:justify-start justify-center mt-4'>
+		<Scoreboard active={$turn} controlled={controlledPlayer} players={$players} />
 	</section>
-</div>
+</div>`
 
 <!--{(console.log($deck), '')}-->
 <!--{(console.log($pile), '')}-->
-<!--{(console.log($step), '')}-->
+{(console.log($step), '')}
 <!--{(console.log("turn: " + $turn), '')}-->
 
 <style>

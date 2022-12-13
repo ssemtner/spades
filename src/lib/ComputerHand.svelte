@@ -9,7 +9,7 @@
 	export let active: boolean;
 </script>
 
-<div class='grid grid-cols-1 grid-rows-1'>
+<div class='grid grid-cols-1 grid-rows-1 scale-75 md:scale-100 -m-6 md:m-0'>
 	{#each cards as card, i (card.id)}
 		<div
 			animate:flip

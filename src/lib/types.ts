@@ -19,7 +19,8 @@ export type Player = {
 	tricks: number
 	computer: boolean
 	controlled: boolean
-	bid: number | false
+	bid: number | ''
+	score: number
 }
 
 export enum GameStep {

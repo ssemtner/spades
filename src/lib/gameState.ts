@@ -53,7 +53,7 @@ export function chooseRandomPlay(playerId: number): number {
 	return options[index].id;
 }
 
-function setStepByTurn() {
+export function setStepByTurn() {
 	if (get(players)[get(turn)].computer) {
 		step.set(get(onlineGame) ? GameStep.REMOTE_PLAY : GameStep.COMPUTER_PLAY);
 	} else {
@@ -82,12 +82,12 @@ export function finishTurn() {
 }
 
 export function makeBid(bid: number) {
-	const player = get(players).find(player => player.controlled);
-	if (player === undefined) {
+	const player = get(players).findIndex(player => player.controlled);
+	if (player === -1) {
 		return false;
 	}
 
-	player.bid = bid;
+	players.setBid(player, bid);
 
 	step.set(GameStep.WAIT_FOR_BID);
 }
@@ -102,7 +102,8 @@ export function resetGame() {
 			tricks: 0,
 			computer: !get(onlineGame) && id !== 0,
 			controlled: id === 0,
-			bid: false
+			bid: '',
+			score: 0
 		}))
 	);
 	turn.reset(0);
@@ -128,6 +129,13 @@ export const players = {
 		this.update((prev) => {
 			const newPlayers = [...prev];
 			newPlayers[playerId].tricks++;
+			return newPlayers;
+		});
+	},
+	setBid: function(playerId: number, bid: number) {
+		this.update((prev) => {
+			const newPlayers = [...prev];
+			newPlayers[playerId].bid = bid;
 			return newPlayers;
 		});
 	}

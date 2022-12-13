@@ -5,7 +5,7 @@
 	let selected = 1;
 </script>
 
-<div class='flex flex-col justify-center bg-gray-200 rounded-xl'>
+<div class='flex flex-col justify-center bg-gray-200 rounded-xl w-[80%] overflow-x-scroll'>
 	{#if !waiting}
 
 		<div class='text-center font-bold text-2xl p-2'>
@@ -28,7 +28,7 @@
 			Place Bid
 		</button>
 	{:else}
-		<div class='text-center font-bold text-2xl p-2'>
+		<div class='text-center font-bold text-2xl p-8'>
 			Waiting for opponent bids...
 		</div>
 	{/if}
