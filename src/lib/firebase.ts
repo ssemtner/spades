@@ -18,7 +18,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 export async function sendGameState(gameId: string) {
-	console.log("sendddy");
+	console.log('sendddy');
 
 	const docRef = doc(db, 'games', gameId);
 
@@ -49,6 +49,71 @@ export async function getGameState(gameId: string): Promise<boolean> {
 		players.set(data.players);
 		turn.set(data.turn);
 		return true;
+	} catch {
+		return false;
+	}
+
+}
+
+export async function formGameLobby(gameId: string) {
+	const docRef = doc(db, 'lobbies', 'forming');
+
+	const oldRes = await getDoc(docRef);
+
+	if (!oldRes.exists()) {
+		return false;
+	}
+
+	const oldData = oldRes.data();
+
+	const newData = { ...oldData };
+	newData[gameId] = [1, 2, 3];
+
+
+	await setDoc(docRef, newData);
+
+	return true;
+}
+
+export async function getAvailableLobbySlots(gameId: string): Promise<false | number[]> {
+	const docRef = doc(db, 'lobbies', 'forming');
+
+	const result = await getDoc(docRef);
+
+	if (!result.exists()) {
+		return false;
+	}
+
+	const data = result.data();
+
+	try {
+		return data[gameId.toString()];
+	} catch {
+		return false;
+	}
+}
+
+export async function joinGameLobby(gameId: string): Promise<false | number> {
+	const docRef = doc(db, 'lobbies', 'forming');
+	const result = await getDoc(docRef);
+	if (!result.exists()) {
+		return false;
+	}
+
+
+	try {
+		const data = result.data();
+
+		if (data[gameId].length === 0) {
+			return false;
+		}
+
+		const id = data[gameId].shift();
+
+		await setDoc(docRef, data);
+
+		return id || false;
+
 	} catch {
 		return false;
 	}

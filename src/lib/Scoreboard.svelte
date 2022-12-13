@@ -22,7 +22,7 @@
 		</thead>
 		<tbody>
 		{#each players as player (player.id)}
-			<tr class='p-2 last:rounded-b first-of-type:-mt-0.5 {"bg-gray-100"}'>
+			<tr class='p-2 last:rounded-b first-of-type:-mt-0.5 {active === player.id ? "bg-gray-50": "bg-gray-100"}'>
 				<td class='px-4 text-sm uppercase'>Player {player.id + 1}{player.controlled ? " (You)" : ""}:</td>
 				<td class='p-2 text-center'>
 					{#key player.bid}

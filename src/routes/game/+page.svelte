@@ -39,7 +39,7 @@
 			if ($turn !== controlledPlayer) {
 				getGameState($gameId);
 			}
-		}, 4000);
+		}, 2000);
 	}
 
 	const [send, receive] = crossfade({
@@ -70,7 +70,7 @@
 	$: {
 		if ($step === GameStep.WAIT_FOR_BID) {
 			for (let player of $players.filter(player => player.computer === true)) {
-				players.setBid(player.id, Math.floor(Math.random() * 4) + 1);
+				players.setBid(player.id, Math.min(Math.floor(Math.random() * 4) + 1, Math.floor(Math.random() * 4) + 1));
 			}
 			setStepByTurn();
 		}
@@ -80,11 +80,22 @@
 <svelte:head>
 	<title>{$onlineGame ? 'Online' : 'Local'} Spades Game</title>
 </svelte:head>
+
+{#if $onlineGame}
+	<div class='text-center my-2 text-lg'>
+		<span>Game Id:</span>
+		<pre class='inline text-lg my-auto'>{$gameId}</pre>
+	</div>
+{/if}
+
 <div class='flex lg:flex-row flex-col lg:justify-between justify-center'>
 
 	<section class='md:w-1/4 flex md:flex-col flex-row justify-center items-center overflow-x-hidden'>
 		{#each [1, 2, 3] as p }
-			<ComputerHand cards={$deck.filter(card => card.owner === p)} {send} active={$turn === p} />
+			<div class='flex md:flex-row flex-col align-middle lg:justify-start justify-center'>
+				<h1 class='my-auto text-3xl font-serif text-gray-700 text-center'>{p + 1}</h1>
+				<ComputerHand cards={$deck.filter(card => card.owner === p)} {send} active={$turn === p} />
+			</div>
 		{/each}
 	</section>
 

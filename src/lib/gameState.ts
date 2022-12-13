@@ -11,7 +11,7 @@ import type { Card, Player } from './types';
 import { GameStep } from './types';
 import { get, type Writable, writable } from 'svelte/store';
 import { generateDeck } from './deck';
-import { determineTrickWinner, isValidPlay } from './game';
+import { calculateScore, determineTrickWinner, isValidPlay } from './game';
 import { sendGameState } from './firebase';
 
 function createCustomStore<Type>(defaultValue: Type): Writable<Type> {
@@ -55,7 +55,7 @@ export function chooseRandomPlay(playerId: number): number {
 
 export function setStepByTurn() {
 	if (get(players)[get(turn)].computer) {
-		step.set(get(onlineGame) ? GameStep.REMOTE_PLAY : GameStep.COMPUTER_PLAY);
+		step.set(get(players)[get(turn)].computer ? GameStep.COMPUTER_PLAY : GameStep.REMOTE_PLAY);
 	} else {
 		step.set(GameStep.HUMAN_PLAY);
 	}
@@ -71,13 +71,18 @@ export function finishTurn() {
 			setTimeout(() => {
 				pile.set([]);
 				turn.reset(winner);
+				if (get(deck).length === 0) {
+					completeRound();
+				} else {
+					setStepByTurn();
+				}
 				!get(onlineGame) || sendGameState(get(gameId));
-				setStepByTurn();
 			}, 500);
 		}, 1000);
 	} else {
 		turn.next();
 		setStepByTurn();
+		!get(onlineGame) || sendGameState(get(gameId));
 	}
 }
 
@@ -92,22 +97,37 @@ export function makeBid(bid: number) {
 	step.set(GameStep.WAIT_FOR_BID);
 }
 
+export function completeRound() {
+	get(players).forEach((player, i) => {
+		const score = calculateScore(player);
+
+		players.increaseScore(i, score);
+	});
+
+	resetRound(Math.floor(Math.random() * 4) + 1);
+}
+
 export function resetGame() {
-	spadesPlayed.set(false);
-	deck.set(generateDeck());
-	pile.set([]);
+	resetRound(0);
 	players.set(
 		[0, 1, 2, 3].map((id) => ({
 			id,
 			tricks: 0,
 			computer: !get(onlineGame) && id !== 0,
-			controlled: id === 0,
-			bid: '',
+			controlled: id === get(controlled),
+			bid: 0,
 			score: 0
 		}))
 	);
-	turn.reset(0);
+}
+
+export function resetRound(lead: number) {
+	spadesPlayed.set(false);
+	deck.set(generateDeck());
+	pile.set([]);
+	turn.reset(lead);
 	step.set(GameStep.BID);
+	players.set(get(players).map(player => ({ ...player, bid: 0, tricks: 0 })));
 }
 
 export const spadesPlayed = writable(false);
@@ -138,6 +158,14 @@ export const players = {
 			newPlayers[playerId].bid = bid;
 			return newPlayers;
 		});
+		!onlineGame || sendGameState(get(gameId));
+	},
+	increaseScore: function(playerId: number, score: number) {
+		this.update((prev) => {
+			const newPlayers = [...prev];
+			newPlayers[playerId].score += score;
+			return newPlayers;
+		});
 	}
 };
 
@@ -156,10 +184,12 @@ export const turn = {
 	}
 };
 
-export const onlineGame = writable(false);
+export const onlineGame = writable(true);
+
+export const controlled = writable(0);
 
 export const gameId = {
-	...createCustomStore('test')
+	...createCustomStore('')
 };
 
 export const step = writable<GameStep>(GameStep.NONE);

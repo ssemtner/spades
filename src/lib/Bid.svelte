@@ -5,14 +5,14 @@
 	let selected = 1;
 </script>
 
-<div class='flex flex-col justify-center bg-gray-200 rounded-xl w-[80%] overflow-x-scroll'>
+<div class='flex flex-col justify-center bg-gray-200 rounded-xl lg:w-auto overflow-x-scroll w-[80%]'>
 	{#if !waiting}
 
 		<div class='text-center font-bold text-2xl p-2'>
 			Place Bid
 		</div>
 		<div class='flex flex-row w-[40rem] justify-between m-2'>
-			{#each [...Array(13).keys()] as bid}
+			{#each [...Array(12).keys()].map(x => x + 1) as bid}
 				<div>
 					<input type='radio' name='option' id={bid} class='peer hidden' value={bid} bind:group={selected} />
 					<label

@@ -54,7 +54,7 @@
 
 <svelte:window bind:innerWidth={width} />
 
-<div class='flex flex-row md:justify-center p-2 items-center overflow-x-scroll'>
+<div class='flex flex-row md:justify-center p-2 items-center lg:overflow-x-visible overflow-x-scroll'>
 	{#each cards as card, i (card.id)}
 		<button
 			animate:flip

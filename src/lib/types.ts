@@ -19,7 +19,7 @@ export type Player = {
 	tricks: number
 	computer: boolean
 	controlled: boolean
-	bid: number | ''
+	bid: number
 	score: number
 }
 
