@@ -9,9 +9,9 @@
 
 	const margins = [
 		[PlayerLocation.NORTH, ''],
-		[PlayerLocation.EAST, 'ml-32 mt-32'],
-		[PlayerLocation.SOUTH, 'mt-64'],
-		[PlayerLocation.WEST, '-ml-32 mt-32']
+		[PlayerLocation.EAST, 'ml-48 mt-40'],
+		[PlayerLocation.SOUTH, 'mt-80'],
+		[PlayerLocation.WEST, '-ml-48 mt-40']
 	];
 
 	let locations;

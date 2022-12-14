@@ -25,22 +25,27 @@
 
 	onMount(() => {
 		resetGame();
-		setInterval(() => {
+		const intervals = [];
+		intervals.push(setInterval(() => {
 			if ($step === GameStep.COMPUTER_PLAY) {
 				const card = chooseRandomPlay($turn);
 				addToPile(card);
 				finishTurn();
 			}
-		}, 2000);
-	});
+		}, 2000));
 
-	if ($onlineGame) {
-		setInterval(() => {
-			if ($turn !== controlledPlayer) {
-				getGameState($gameId);
-			}
-		}, 2000);
-	}
+		if ($onlineGame) {
+			intervals.push(setInterval(() => {
+				if (!$players[$turn].controlled && $step !== GameStep.WAIT_FOR_BID) {
+					getGameState($gameId);
+				}
+			}, 1000));
+		}
+
+		return () => {
+			intervals.forEach(x => clearInterval(x));
+		};
+	});
 
 	const [send, receive] = crossfade({
 		duration: 150
@@ -126,11 +131,13 @@
 	<section class='lg:w-1/4 flex lg:flex-col flex-row lg:justify-start justify-center mt-4'>
 		<Scoreboard active={$turn} controlled={controlledPlayer} players={$players} />
 	</section>
-</div>`
+</div>
 
 <!--{(console.log($deck), '')}-->
 <!--{(console.log($pile), '')}-->
-{(console.log($step), '')}
+<!--{(console.log($step), '')}-->
+<!--{(console.log($players), '')}-->
+
 <!--{(console.log("turn: " + $turn), '')}-->
 
 <style>

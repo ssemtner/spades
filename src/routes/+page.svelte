@@ -1,15 +1,19 @@
 <script lang='ts'>
-
-	import { gameId, onlineGame, resetGame } from '$lib/gameState.js';
+	import { controlled, gameId, onlineGame, resetGame } from '$lib/gameState.js';
 	import { formGameLobby, joinGameLobby } from '../lib/firebase';
+	import { goto } from '$app/navigation';
 
 	const createLobby = () => {
 		const id = Date.now().toString().slice(4, -3);
 
-		console.log(id)
+		console.log(id);
 		$gameId = id;
 
 		formGameLobby(id);
+
+		$controlled = 0;
+
+		goto('/lobby', { replaceState: false });
 	};
 	let msg = '';
 	const joinLobby = () => {
@@ -19,8 +23,10 @@
 				return;
 			}
 			msg = '';
-
+			$gameId = idInput;
+			$controlled = result;
 			console.log(result);
+			goto('/lobby', { replaceState: false });
 		});
 	};
 
@@ -38,29 +44,31 @@
 
 		<br />
 
-		<input
-			bind:value={idInput}
-			class='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-blue-500 focus:shadow-outline'
-			id='gameId' placeholder='Game ID' type='text'>
-		<button class='p-4 rounded bg-blue-400 text-white font-bold my-4 block mx-auto' on:click={joinLobby}>
-			Join Game
-		</button>
+<!--		<input-->
+<!--			bind:value={idInput}-->
+<!--			class='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-blue-500 focus:shadow-outline'-->
+<!--			id='gameId' placeholder='Game ID' type='text'>-->
+<!--		<button class='p-4 text-center rounded bg-blue-400 text-white font-bold my-4 block mx-auto'-->
+<!--						on:click={joinLobby}>-->
+<!--			Join Game-->
+<!--		</button>-->
 
-		{#if joiningGame}
-			{#await slotsPromise then slots}
-				{#each slots as slot}
-					<div>{slot}</div>
-				{/each}
-			{/await}
-		{/if}
+<!--		{#if joiningGame}-->
+<!--			{#await slotsPromise then slots}-->
+<!--				{#each slots as slot}-->
+<!--					<div>{slot}</div>-->
+<!--				{/each}-->
+<!--			{/await}-->
+<!--		{/if}-->
 
-		<br />
+<!--		<br />-->
 
-		<a href='/lobby' class='p-4 text-center rounded bg-blue-400 text-white font-bold my-4 block mx-auto' on:click={createLobby}>
-			Create Lobby
-		</a>
+<!--		<button class='p-4 text-center rounded bg-blue-400 text-white font-bold my-4 block mx-auto'-->
+<!--						on:click={createLobby}>-->
+<!--			Create Lobby-->
+<!--		</button>-->
 
-		<br />
+<!--		<br />-->
 
 		<p>{msg}</p>
 	</div>

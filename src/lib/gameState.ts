@@ -1,12 +1,3 @@
-// TODO: all interface functions have to be async
-// TODO: every access of the game state has to await or await in html block
-// TODO: add helper functions like append to pile or update deck or something so that it's not so ugly on the main page
-
-/** TODO
- * NEW IDEA:
- * have a function that gets all the data from firebase and a function that sends it. Takes game id as parameter
- * the gamestate will be non async just writable stores the the update function sets
- */
 import type { Card, Player } from './types';
 import { GameStep } from './types';
 import { get, type Writable, writable } from 'svelte/store';
@@ -95,6 +86,8 @@ export function makeBid(bid: number) {
 	players.setBid(player, bid);
 
 	step.set(GameStep.WAIT_FOR_BID);
+
+	get(onlineGame) || sendGameState((get(gameId)));
 }
 
 export function completeRound() {
