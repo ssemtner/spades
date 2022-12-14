@@ -59,6 +59,11 @@ export function finishTurn() {
 		step.set(GameStep.WAIT);
 		setTimeout(() => {
 			pile.set([]);
+			players.set(get(players).map((player) => ({ ...player, win: winner === player.id })));
+			setTimeout(() => {
+				players.set(get(players).map((player) => ({ ...player, win: false })));
+			}, 2000);
+
 			setTimeout(() => {
 				pile.set([]);
 				turn.reset(winner);
@@ -87,7 +92,7 @@ export function makeBid(bid: number) {
 
 	step.set(GameStep.WAIT_FOR_BID);
 
-	get(onlineGame) || sendGameState((get(gameId)));
+	!get(onlineGame) || sendGameState((get(gameId)));
 }
 
 export function completeRound() {
@@ -109,7 +114,8 @@ export function resetGame() {
 			computer: !get(onlineGame) && id !== 0,
 			controlled: id === get(controlled),
 			bid: 0,
-			score: 0
+			score: 0,
+			win: false
 		}))
 	);
 }
@@ -151,7 +157,7 @@ export const players = {
 			newPlayers[playerId].bid = bid;
 			return newPlayers;
 		});
-		!onlineGame || sendGameState(get(gameId));
+		!get(onlineGame) || sendGameState(get(gameId));
 	},
 	increaseScore: function(playerId: number, score: number) {
 		this.update((prev) => {
@@ -177,7 +183,7 @@ export const turn = {
 	}
 };
 
-export const onlineGame = writable(true);
+export const onlineGame = writable(false);
 
 export const controlled = writable(0);
 

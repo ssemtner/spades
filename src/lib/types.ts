@@ -21,6 +21,7 @@ export type Player = {
 	controlled: boolean
 	bid: number
 	score: number
+	win: boolean
 }
 
 export enum GameStep {

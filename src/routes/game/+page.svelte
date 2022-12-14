@@ -1,5 +1,5 @@
 <script lang='ts'>
-	import { crossfade } from 'svelte/transition';
+	import { crossfade, fade } from 'svelte/transition';
 	import {
 		addToPile,
 		chooseRandomPlay,
@@ -21,7 +21,12 @@
 	import { GameStep } from '../../lib/types';
 	import Bid from '$lib/Bid.svelte';
 	import Pile from '$lib/Pile.svelte';
-	import { makeBid, pile } from '$lib/gameState.js';
+	import { controlled, makeBid, pile } from '$lib/gameState.js';
+	import { spin } from '$lib/animations';
+
+	if (!$onlineGame) {
+		resetGame();
+	}
 
 	onMount(() => {
 		resetGame();
@@ -32,7 +37,7 @@
 				addToPile(card);
 				finishTurn();
 			}
-		}, 2000));
+		}, 1000));
 
 		if ($onlineGame) {
 			intervals.push(setInterval(() => {
@@ -99,7 +104,8 @@
 		{#each [1, 2, 3] as p }
 			<div class='flex md:flex-row flex-col align-middle lg:justify-start justify-center'>
 				<h1 class='my-auto text-3xl font-serif text-gray-700 text-center'>{p + 1}</h1>
-				<ComputerHand cards={$deck.filter(card => card.owner === p)} {send} active={$turn === p} />
+				<ComputerHand cards={$deck.filter(card => card.owner === p)} {send} active={$turn === p}
+											win={$players[p].win} />
 			</div>
 		{/each}
 	</section>
@@ -115,8 +121,16 @@
 		</section>
 
 		{#if $step !== GameStep.BID && $step !== GameStep.WAIT_FOR_BID}
-			<section class='flex flex-row justify-center mb-4'>
+			<section class='flex flex-row justify-center mb-4 relative'>
 				<button class='p-4 rounded bg-blue-400 mx-2 text-white font-bold' on:click={playCard}>Play Card</button>
+				{#if $players[$controlled].win}
+					<div class='absolute -mt-24'>
+						<div in:spin={{duration: 3000}} out:fade={{duration: 1000}}
+								 class='relative m-auto text-white font-bold text-6xl'>
+							+1
+						</div>
+					</div>
+				{/if}
 			</section>
 		{/if}
 
